@@ -1,0 +1,42 @@
+# Mina Body Touch - Streamlit App pour Cloud Run
+FROM python:3.11-slim
+
+# Variables d'environnement
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PORT=8080
+
+# Métadonnées
+LABEL maintainer="Mina Team" \
+    version="1.0-pilot" \
+    description="Mina Body Touch - Interface vocale Body Minute"
+
+WORKDIR /app
+
+# Installation dépendances système (audio)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copie et installation requirements
+COPY requirements_streamlit.txt .
+RUN pip install --no-cache-dir -r requirements_streamlit.txt
+
+# Copie du code source
+COPY scripts/app_chatbot.py ./app_chatbot.py
+COPY backend/ ./backend/
+
+# Configuration Streamlit pour Cloud Run
+RUN mkdir -p ~/.streamlit
+RUN echo '[server]\nheadless = true\nport = 8080\nenableCORS = false\nenableXsrfProtection = false\n\n[browser]\ngatherUsageStats = false' > ~/.streamlit/config.toml
+
+# Port Cloud Run
+EXPOSE 8080
+
+# Utilisateur non-root
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Lancement Streamlit sur port Cloud Run
+CMD ["streamlit", "run", "app_chatbot.py", "--server.port=8080", "--server.address=0.0.0.0"]

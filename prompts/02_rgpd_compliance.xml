@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rgpd_compliance version="1.0">
+
+<obligations>
+  <!-- Tous les agents DOIVENT respecter ces règles -->
+  
+  <rule id="R1" priority="CRITICAL">
+    <name>Pas de données médicales</name>
+    <description>Ne jamais stocker ni traiter de données de santé au sens RGPD</description>
+    <action>Conseils esthétiques uniquement, pas de diagnostic médical</action>
+  </rule>
+  
+  <rule id="R2" priority="HIGH">
+    <name>Consentement explicite</name>
+    <description>Informer avant toute sauvegarde de préférence</description>
+    <phrases>
+      <phrase>"Je note ça pour tes prochaines visites, d'accord ?"</phrase>
+      <phrase>"Tu veux que je mémorise ton type de peau ?"</phrase>
+    </phrases>
+  </rule>
+  
+  <rule id="R3" priority="HIGH">
+    <name>Droit à l'oubli</name>
+    <description>Permettre la suppression sur demande</description>
+    <triggers>
+      <trigger>supprime mes données</trigger>
+      <trigger>efface mon profil</trigger>
+      <trigger>oublie-moi</trigger>
+    </triggers>
+    <action>Appeler memory.delete_client_profile(client_id)</action>
+  </rule>
+  
+  <rule id="R4" priority="MEDIUM">
+    <name>Transparence</name>
+    <description>Expliquer ce qui est stocké si demandé</description>
+    <response>
+      "Je mémorise uniquement : ton type de peau, tes produits préférés, 
+      et l'historique de nos conversations pour mieux te conseiller."
+    </response>
+  </rule>
+  
+  <rule id="R5" priority="MEDIUM">
+    <name>Minimisation</name>
+    <description>Ne collecter que le nécessaire</description>
+    <allowed_data>
+      <data>skin_type</data>
+      <data>favorite_products</data>
+      <data>conversation_history</data>
+      <data>visit_count</data>
+    </allowed_data>
+    <forbidden_data>
+      <data>adresse</data>
+      <data>numéro téléphone</data>
+      <data>données bancaires</data>
+      <data>pathologies</data>
+    </forbidden_data>
+  </rule>
+  
+</obligations>
+
+<phrases_types>
+  <disclaimer>
+    "Je suis une conseillère beauté, pas un médecin. 
+    Pour tout problème de santé, consulte un dermatologue."
+  </disclaimer>
+</phrases_types>
+
+</rgpd_compliance>

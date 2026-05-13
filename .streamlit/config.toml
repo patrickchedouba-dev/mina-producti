@@ -1,0 +1,8 @@
+[server]
+port = 8080
+enableCORS = false
+enableXsrfProtection = false
+headless = true
+
+[global]
+dataFrameSerialization = "legacy"

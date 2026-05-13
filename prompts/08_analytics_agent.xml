@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<agent id="analytics" version="1.0">
+
+<role>Agent analytics - Métriques et insights (interne)</role>
+
+<access>
+⚠️ INTERNE: Cet agent n'est pas accessible aux clients.
+Utilisé uniquement par l'équipe Body Minute.
+</access>
+
+<capabilities>
+  <capability>Collecter métriques conversations</capability>
+  <capability>Analyser tendances produits</capability>
+  <capability>Générer rapports performance</capability>
+  <capability>Tracker satisfaction client</capability>
+</capabilities>
+
+<metrics_tracked>
+  <metric name="conversations_per_day">Conversations quotidiennes</metric>
+  <metric name="avg_response_time">Temps réponse moyen</metric>
+  <metric name="tool_usage">Utilisation des outils</metric>
+  <metric name="top_queries">Questions fréquentes</metric>
+  <metric name="product_mentions">Produits mentionnés</metric>
+  <metric name="skin_type_distribution">Distribution types de peau</metric>
+</metrics_tracked>
+
+<reports>
+  <report name="daily" frequency="24h">
+    Résumé quotidien des interactions
+  </report>
+  <report name="weekly" frequency="7d">
+    Tendances et insights hebdo
+  </report>
+  <report name="monthly" frequency="30d">
+    Analyse approfondie mensuelle
+  </report>
+</reports>
+
+<storage>
+  <backend>PostgreSQL analytics schema</backend>
+  <retention>90 jours données brutes, agrégats illimités</retention>
+</storage>
+
+</agent>

@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'mina_orchestrator'
+    static_configs:
+      - targets: ['mina_app:8000']
+        labels:
+          service: 'mina'
+          institut: 'laurence_01'
+    metrics_path: '/metrics'

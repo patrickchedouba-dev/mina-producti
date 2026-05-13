@@ -1,0 +1,10 @@
+{"timestamp": "2024-12-23T10:00:00", "event_type": "request", "latency_ms": 450, "success": true, "language": "fr", "conversation_state": "NEUTRAL", "institut_id": "BM-PARIS-01"}
+{"timestamp": "2024-12-23T10:00:15", "event_type": "request", "latency_ms": 520, "success": true, "language": "fr", "conversation_state": "HESITATION", "institut_id": "BM-PARIS-01"}
+{"timestamp": "2024-12-23T10:00:30", "event_type": "request", "latency_ms": 380, "success": true, "language": "en", "conversation_state": "NEUTRAL", "institut_id": "BM-NICE-01"}
+{"timestamp": "2024-12-23T10:00:45", "event_type": "request", "latency_ms": 12000, "success": true, "language": "fr", "conversation_state": "RUSH", "institut_id": "BM-LYON-01", "metadata": {"warning": "latency_high"}}
+{"timestamp": "2024-12-23T10:01:00", "event_type": "error", "success": false, "error_message": "Qdrant connection timeout", "institut_id": "BM-LYON-01"}
+{"timestamp": "2024-12-23T10:01:15", "event_type": "request", "latency_ms": 890, "success": true, "language": "ar", "conversation_state": "CURIOSITY", "institut_id": "BM-MARSEILLE-01"}
+{"timestamp": "2024-12-23T10:01:30", "event_type": "request", "latency_ms": 430, "success": true, "language": "fr", "conversation_state": "NEUTRAL", "institut_id": "BM-PARIS-01"}
+{"timestamp": "2024-12-23T10:01:45", "event_type": "request", "latency_ms": 6500, "success": true, "language": "fr", "conversation_state": "DOUBT", "institut_id": "BM-BORDEAUX-01", "metadata": {"warning": "latency_elevated"}}
+{"timestamp": "2024-12-23T10:02:00", "event_type": "request", "latency_ms": 510, "success": true, "language": "es", "conversation_state": "GREETING", "institut_id": "BM-TOULOUSE-01"}
+{"timestamp": "2024-12-23T10:02:15", "event_type": "error", "success": false, "error_message": "Speech API quota exceeded", "institut_id": "BM-LYON-01"}

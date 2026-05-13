@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MINA V2 - Complete System Prompt
+  Architecture Multi-Agent avec Supervisor
+  
+  Usage: Charger ce fichier pour initialiser le système complet
+-->
+<mina_system version="2.0">
+
+  <!-- 1. SUPERVISOR (orchestrateur principal) -->
+  <include src="01_system_prompt_supervisor.xml" />
+
+  <!-- 2. RGPD (obligatoire tous agents) -->
+  <include src="02_rgpd_compliance.xml" />
+
+  <!-- 3. AGENTS SPÉCIALISÉS -->
+  <agents>
+    <agent id="conversation" src="03_conversation_agent.xml" priority="1">
+      Salutations, bavardage, questions générales
+    </agent>
+    <agent id="diagnosis" src="04_diagnosis_agent.xml" priority="2">
+      Analyse peau, diagnostic esthétique
+    </agent>
+    <agent id="recommendation" src="05_recommendation_agent.xml" priority="2">
+      Recommandations produits, soins
+    </agent>
+    <agent id="booking" src="06_booking_agent.xml" priority="3">
+      Rendez-vous, réservations (mock)
+    </agent>
+    <agent id="memory" src="07_memory_agent.xml" priority="1">
+      Historique, préférences, profil client
+    </agent>
+    <agent id="analytics" src="08_analytics_agent.xml" priority="4" internal="true">
+      Métriques, statistiques (interne)
+    </agent>
+  </agents>
+
+  <!-- 4. MCP SERVERS -->
+  <mcp_servers>
+    <server name="redis_memory" type="memory_cache">
+      <purpose>Sessions court terme (TTL 30min)</purpose>
+      <module>backend.memory.redis_client</module>
+    </server>
+    <server name="postgres_db" type="persistent_storage">
+      <purpose>Historique + profils clients</purpose>
+      <module>backend.memory.postgres_client</module>
+    </server>
+    <server name="qdrant_vectors" type="vector_database">
+      <purpose>RAG produits et documentation</purpose>
+      <module>backend.qdrant_client</module>
+    </server>
+    <server name="vision_ai" type="image_analysis">
+      <purpose>Analyse photos peau/produits</purpose>
+      <module>backend.product_vision</module>
+    </server>
+  </mcp_servers>
+
+  <!-- 5. CONFIGURATION RUNTIME -->
+  <runtime>
+    <model>gemini-2.0-flash</model>
+    <max_iterations>5</max_iterations>
+    <temperature>0.3</temperature>
+    <max_tokens>500</max_tokens>
+  </runtime>
+
+  <!-- 6. FEATURE FLAGS -->
+  <feature_flags>
+    <flag name="MINA_AGENT_ENABLED" default="false" />
+    <flag name="MINA_MEMORY_ENABLED" default="false" />
+    <flag name="MINA_MCP_ENABLED" default="false" />
+    <flag name="MINA_REALTIME_ENABLED" default="false" />
+  </feature_flags>
+
+</mina_system>
