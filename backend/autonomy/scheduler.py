@@ -16,6 +16,18 @@ from .triggers import ALL_TRIGGERS, BaseTrigger
 logger = logging.getLogger(__name__)
 
 
+def _run_trigger(trigger_id: str, engine=None):
+    """Fonction sérialisable par APScheduler pour exécuter un trigger."""
+    from backend.autonomy.triggers import ALL_TRIGGERS
+    from backend.autonomy.decision_engine import DecisionEngine
+    trigger = next((t for t in ALL_TRIGGERS if t.id == trigger_id), None)
+    if trigger is None:
+        return
+    if engine is None:
+        engine = DecisionEngine()
+    trigger.run(engine)
+
+
 class AutonomyScheduler:
     """Planificateur de la boucle autonome MINA."""
 
@@ -54,71 +66,29 @@ class AutonomyScheduler:
             job_defaults=job_defaults,
         )
 
-    def _make_job_func(self, trigger: BaseTrigger):
-        """Crée la fonction de job pour un trigger."""
-        engine = self._engine
-        journal = self._journal
-
-        def job_func():
-            try:
-                result = trigger.run(engine=engine)
-                journal.log_action(
-                    trigger_id=trigger.id,
-                    signal=trigger.build_signal().get("description", ""),
-                    decision="agir" if result.get("executed") else "abstenir",
-                    niveau=trigger.niveau.value,
-                    action=str(result.get("decision", {}).get("action", "")),
-                    resultat=result.get("resultat", "inconnu"),
-                )
-            except Exception as exc:
-                logger.error("Erreur trigger [%s]: %s", trigger.id, exc)
-                journal.log_action(
-                    trigger_id=trigger.id,
-                    signal="erreur_execution",
-                    decision="echec",
-                    niveau=trigger.niveau.value,
-                    action=str(exc),
-                    resultat="echec",
-                )
-
-        job_func.__name__ = f"job_{trigger.id}"
-        return job_func
-
     def register_all(self):
         """Enregistre tous les triggers dans le scheduler."""
+        from apscheduler.triggers.interval import IntervalTrigger
+        from apscheduler.triggers.cron import CronTrigger
+
         if self._scheduler is None:
             self._build_scheduler()
 
         for trigger in ALL_TRIGGERS:
-            job_id = f"autonomy_{trigger.id}"
-
-            # Supprimer l'ancien job s'il existe (re-register propre)
-            if self._scheduler.get_job(job_id):
-                self._scheduler.remove_job(job_id)
-
-            func = self._make_job_func(trigger)
-
             if trigger.schedule_type == "interval":
-                self._scheduler.add_job(
-                    func,
-                    "interval",
-                    id=job_id,
-                    replace_existing=True,
-                    **trigger.schedule_args,
-                )
-            elif trigger.schedule_type == "cron":
-                self._scheduler.add_job(
-                    func,
-                    "cron",
-                    id=job_id,
-                    replace_existing=True,
-                    **trigger.schedule_args,
-                )
-
-            logger.info(
-                "📅 Trigger enregistré: %s [%s] %s",
-                trigger.id, trigger.schedule_type, trigger.schedule_args,
+                apscheduler_trigger = IntervalTrigger(**trigger.schedule_args)
+            else:
+                apscheduler_trigger = CronTrigger(**trigger.schedule_args)
+            self._scheduler.add_job(
+                _run_trigger,
+                apscheduler_trigger,
+                args=[trigger.id],
+                id=trigger.id,
+                replace_existing=True,
+                misfire_grace_time=3600,
             )
+            logger.info("📅 Trigger enregistré: %s [%s] %s",
+                        trigger.id, trigger.schedule_type, trigger.schedule_args)
 
     def start(self):
         """Démarre le scheduler et log dans le journal."""
