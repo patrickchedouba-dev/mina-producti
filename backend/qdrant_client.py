@@ -299,13 +299,15 @@ class QdrantVectorClient:
                 f"Recherche: collection={target_collection}, limit={limit}, filter={filter_conditions}"
             )
             
-            results = self.client.search(
+            from qdrant_client.models import QueryRequest
+            results_wrapper = self.client.query_points(
                 collection_name=target_collection,
-                query_vector=query_vector,
+                query=query_vector,
                 limit=limit,
                 query_filter=query_filter,
                 with_payload=True
             )
+            results = results_wrapper.points
             
             search_results = []
             for hit in results:

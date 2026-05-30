@@ -40,7 +40,7 @@ class TextExtractor:
         self,
         use_ocr: bool = True,
         project_id: str = None,
-        location: str = "eu",
+        location: str = "us",
         processor_id: str = None
     ):
         """
@@ -138,6 +138,166 @@ class TextExtractor:
             logger.error(f"Erreur get/create processeur: {e}")
             return None
     
+
+    def extract_from_uri(self, gcs_uri: str, filename: str) -> ExtractionResult:
+        """Extrait le texte d'un PDF via son URI GCS — sans téléchargement local."""
+        if not self._init_document_ai():
+            return ExtractionResult(text='', success=False, error_message='Document AI non disponible')
+        try:
+            from google.cloud import documentai_v1 as documentai
+            from google.cloud import storage
+            import json, time
+            output_prefix = f"_docai_output/{filename.replace('/','_').replace(' ','_')}/"
+            output_uri = f"gs://mina-pdfs/{output_prefix}"
+            request = documentai.BatchProcessRequest(
+                name=self.processor_id,
+                input_documents=documentai.BatchDocumentsInputConfig(
+                    gcs_documents=documentai.GcsDocuments(
+                        documents=[documentai.GcsDocument(gcs_uri=gcs_uri, mime_type='application/pdf')]
+                    )
+                ),
+                document_output_config=documentai.DocumentOutputConfig(
+                    gcs_output_config=documentai.DocumentOutputConfig.GcsOutputConfig(gcs_uri=output_uri)
+                )
+            )
+            print(f'[DEBUG] Batch lancé: {gcs_uri}')
+            operation = self._docai_client.batch_process_documents(request=request)
+            operation.result(timeout=300)
+            storage_client = storage.Client()
+            bucket = storage_client.bucket('mina-pdfs')
+            full_text = []
+            for blob in bucket.list_blobs(prefix=output_prefix):
+                if blob.name.endswith('.json'):
+                    data = json.loads(blob.download_as_text())
+                    full_text.append(data.get('text', ''))
+                    blob.delete()
+            text = self._clean_text('\n'.join(full_text))
+            logger.info(f'Extraction [GCS batch]: {filename} ({len(text)} chars)')
+            return ExtractionResult(text=text, success=True)
+        except Exception as e:
+            logger.error(f'Erreur batch GCS {filename}: {e}')
+            return ExtractionResult(text='', success=False, error_message=str(e))
+
+
+    def extract_from_uri(self, gcs_uri: str, filename: str) -> ExtractionResult:
+        """Extrait le texte d'un PDF via son URI GCS — sans téléchargement local."""
+        if not self._init_document_ai():
+            return ExtractionResult(text='', success=False, error_message='Document AI non disponible')
+        try:
+            from google.cloud import documentai_v1 as documentai
+            from google.cloud import storage
+            import json, time
+            output_prefix = f"_docai_output/{filename.replace('/','_').replace(' ','_')}/"
+            output_uri = f"gs://mina-pdfs/{output_prefix}"
+            request = documentai.BatchProcessRequest(
+                name=self.processor_id,
+                input_documents=documentai.BatchDocumentsInputConfig(
+                    gcs_documents=documentai.GcsDocuments(
+                        documents=[documentai.GcsDocument(gcs_uri=gcs_uri, mime_type='application/pdf')]
+                    )
+                ),
+                document_output_config=documentai.DocumentOutputConfig(
+                    gcs_output_config=documentai.DocumentOutputConfig.GcsOutputConfig(gcs_uri=output_uri)
+                )
+            )
+            print(f'[DEBUG] Batch lancé: {gcs_uri}')
+            operation = self._docai_client.batch_process_documents(request=request)
+            operation.result(timeout=300)
+            storage_client = storage.Client()
+            bucket = storage_client.bucket('mina-pdfs')
+            full_text = []
+            for blob in bucket.list_blobs(prefix=output_prefix):
+                if blob.name.endswith('.json'):
+                    data = json.loads(blob.download_as_text())
+                    full_text.append(data.get('text', ''))
+                    blob.delete()
+            text = self._clean_text('\n'.join(full_text))
+            logger.info(f'Extraction [GCS batch]: {filename} ({len(text)} chars)')
+            return ExtractionResult(text=text, success=True)
+        except Exception as e:
+            logger.error(f'Erreur batch GCS {filename}: {e}')
+            return ExtractionResult(text='', success=False, error_message=str(e))
+
+
+    def extract_from_uri(self, gcs_uri: str, filename: str) -> ExtractionResult:
+        """Extrait le texte d'un PDF via son URI GCS — sans téléchargement local."""
+        if not self._init_document_ai():
+            return ExtractionResult(text='', success=False, error_message='Document AI non disponible')
+        try:
+            from google.cloud import documentai_v1 as documentai
+            from google.cloud import storage
+            import json, time
+            output_prefix = f"_docai_output/{filename.replace('/','_').replace(' ','_')}/"
+            output_uri = f"gs://mina-pdfs/{output_prefix}"
+            request = documentai.BatchProcessRequest(
+                name=self.processor_id,
+                input_documents=documentai.BatchDocumentsInputConfig(
+                    gcs_documents=documentai.GcsDocuments(
+                        documents=[documentai.GcsDocument(gcs_uri=gcs_uri, mime_type='application/pdf')]
+                    )
+                ),
+                document_output_config=documentai.DocumentOutputConfig(
+                    gcs_output_config=documentai.DocumentOutputConfig.GcsOutputConfig(gcs_uri=output_uri)
+                )
+            )
+            print(f'[DEBUG] Batch lancé: {gcs_uri}')
+            operation = self._docai_client.batch_process_documents(request=request)
+            operation.result(timeout=300)
+            storage_client = storage.Client()
+            bucket = storage_client.bucket('mina-pdfs')
+            full_text = []
+            for blob in bucket.list_blobs(prefix=output_prefix):
+                if blob.name.endswith('.json'):
+                    data = json.loads(blob.download_as_text())
+                    full_text.append(data.get('text', ''))
+                    blob.delete()
+            text = self._clean_text('\n'.join(full_text))
+            logger.info(f'Extraction [GCS batch]: {filename} ({len(text)} chars)')
+            return ExtractionResult(text=text, success=True)
+        except Exception as e:
+            logger.error(f'Erreur batch GCS {filename}: {e}')
+            return ExtractionResult(text='', success=False, error_message=str(e))
+
+
+    def extract_from_uri(self, gcs_uri: str, filename: str) -> ExtractionResult:
+        """Extrait le texte d'un PDF via son URI GCS — sans téléchargement local."""
+        if not self._init_document_ai():
+            return ExtractionResult(text='', success=False, error_message='Document AI non disponible')
+        try:
+            from google.cloud import documentai_v1 as documentai
+            from google.cloud import storage
+            import json, time
+            output_prefix = f"_docai_output/{filename.replace('/','_').replace(' ','_')}/"
+            output_uri = f"gs://mina-pdfs/{output_prefix}"
+            request = documentai.BatchProcessRequest(
+                name=self.processor_id,
+                input_documents=documentai.BatchDocumentsInputConfig(
+                    gcs_documents=documentai.GcsDocuments(
+                        documents=[documentai.GcsDocument(gcs_uri=gcs_uri, mime_type='application/pdf')]
+                    )
+                ),
+                document_output_config=documentai.DocumentOutputConfig(
+                    gcs_output_config=documentai.DocumentOutputConfig.GcsOutputConfig(gcs_uri=output_uri)
+                )
+            )
+            print(f'[DEBUG] Batch lancé: {gcs_uri}')
+            operation = self._docai_client.batch_process_documents(request=request)
+            operation.result(timeout=300)
+            storage_client = storage.Client()
+            bucket = storage_client.bucket('mina-pdfs')
+            full_text = []
+            for blob in bucket.list_blobs(prefix=output_prefix):
+                if blob.name.endswith('.json'):
+                    data = json.loads(blob.download_as_text())
+                    full_text.append(data.get('text', ''))
+                    blob.delete()
+            text = self._clean_text('\n'.join(full_text))
+            logger.info(f'Extraction [GCS batch]: {filename} ({len(text)} chars)')
+            return ExtractionResult(text=text, success=True)
+        except Exception as e:
+            logger.error(f'Erreur batch GCS {filename}: {e}')
+            return ExtractionResult(text='', success=False, error_message=str(e))
+
     def extract(
         self,
         content: bytes,
@@ -243,15 +403,15 @@ class TextExtractor:
             from google.cloud import documentai_v1 as documentai
             
             # Préparer le document
-            raw_document = documentai.RawDocument(
-                content=content,
+            gcs_document = documentai.GcsDocument(
+                gcs_uri=f"gs://mina-pdfs/{filename}",
                 mime_type="application/pdf",
             )
             
             # Créer la requête
             request = documentai.ProcessRequest(
                 name=self.processor_id,
-                raw_document=raw_document,
+                gcs_document=gcs_document,
             )
             
             # Traiter le document (côté serveur Google)

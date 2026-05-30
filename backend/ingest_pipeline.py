@@ -149,12 +149,16 @@ class IngestionPipeline:
         logger.info(f"Traitement: {doc_info.name}")
         
         try:
-            # 1. Téléchargement
-            content = self.gcs.download_as_bytes(doc_info.name)
-            logger.debug(f"Téléchargé: {len(content)} bytes")
-            
-            # 2. Extraction du texte
-            extraction = self.extractor.extract(content, doc_info.name)
+            # 1. Téléchargement (ignoré pour PDFs — Document AI lit directement depuis GCS)
+            import os
+            if os.path.splitext(doc_info.name)[1].lower() == ".pdf":
+                logger.debug(f"PDF: lecture directe GCS sans téléchargement")
+                gcs_uri = f"gs://mina-pdfs/{doc_info.name}"
+                extraction = self.extractor.extract_from_uri(gcs_uri, doc_info.name)
+            else:
+                content = self.gcs.download_as_bytes(doc_info.name)
+                logger.debug(f"Téléchargé: {len(content)} bytes")
+                extraction = self.extractor.extract(content, doc_info.name)
             if not extraction.success:
                 raise ValueError(f"Extraction échouée: {extraction.error_message}")
             
