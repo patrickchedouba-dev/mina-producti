@@ -1,0 +1,465 @@
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/runpy.py:126: RuntimeWarning: 'backend.ingest_pipeline' found in sys.modules after import of package 'backend', but prior to execution of 'backend.ingest_pipeline'; this may result in unpredictable behaviour
+  warn(RuntimeWarning(msg))
+2026-05-13 09:11:21 | INFO     | backend.gcs_client | Client GCS initialisé pour bucket: mina-pdfs
+2026-05-13 09:11:21 | INFO     | backend.text_extraction | TextExtractor initialisé (OCR=Document AI)
+2026-05-13 09:11:21 | INFO     | backend.chunking | TextChunker initialisé: size=800, overlap=150
+2026-05-13 09:11:21 | INFO     | backend.embeddings_client | VertexAI Embeddings: model=text-embedding-004, location=europe-west1
+2026-05-13 09:11:21 | INFO     | backend.embeddings_client | BatchEmbedder initialisé: batch_size=100
+2026-05-13 09:11:21 | INFO     | backend.qdrant_client | QdrantClient configuré: CLOUD → https://2d47e34f-2faf-40b5-87a9-03f4b06a6cd5.europ..., collection=mina_documents
+2026-05-13 09:11:21 | INFO     | __main__ | Pipeline d'ingestion initialisé
+2026-05-13 09:11:21 | INFO     | __main__ | ============================================================
+2026-05-13 09:11:21 | INFO     | __main__ | DÉMARRAGE PIPELINE D'INGESTION MINA
+2026-05-13 09:11:21 | INFO     | __main__ | ============================================================
+2026-05-13 09:11:21 | INFO     | __main__ | === SETUP DU PIPELINE ===
+2026-05-13 09:11:21 | INFO     | httpx | HTTP Request: GET https://2d47e34f-2faf-40b5-87a9-03f4b06a6cd5.europe-west3-0.gcp.cloud.qdrant.io:6333/collections "HTTP/1.1 200 OK"
+2026-05-13 09:11:21 | INFO     | httpx | HTTP Request: GET https://2d47e34f-2faf-40b5-87a9-03f4b06a6cd5.europe-west3-0.gcp.cloud.qdrant.io:6333 "HTTP/1.1 200 OK"
+2026-05-13 09:11:21 | INFO     | backend.qdrant_client | Connexion Qdrant OK - 1 collections
+2026-05-13 09:11:21 | INFO     | httpx | HTTP Request: GET https://2d47e34f-2faf-40b5-87a9-03f4b06a6cd5.europe-west3-0.gcp.cloud.qdrant.io:6333/collections "HTTP/1.1 200 OK"
+2026-05-13 09:11:21 | INFO     | backend.qdrant_client | Collection mina_documents existe déjà
+2026-05-13 09:11:21 | INFO     | __main__ | Setup terminé avec succès
+2026-05-13 09:11:21 | INFO     | __main__ | Récupération de la liste des documents...
+2026-05-13 09:11:21 | INFO     | backend.gcs_client | Listing des documents (prefix=None, supported_only=True)
+2026-05-13 09:11:21 | INFO     | backend.gcs_client | Listing terminé: 23 documents trouvés, 0 ignorés
+2026-05-13 09:11:21 | INFO     | __main__ | Documents à traiter: 23
+2026-05-13 09:11:21 | INFO     | __main__ | [1/23] 10_PROTOCOLE_TOP_SOURCILS/PROTOCOLE_TOP_SOURCILS.pdf
+2026-05-13 09:11:21 | INFO     | __main__ | Traitement: 10_PROTOCOLE_TOP_SOURCILS/PROTOCOLE_TOP_SOURCILS.pdf
+2026-05-13 09:11:22 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: 10_PROTOCOLE_TOP_SOURCILS/PROTOCOLE_TOP_SOURCILS.pdf
+2026-05-13 09:11:25 | INFO     | backend.text_extraction | Création d'un nouveau processeur OCR...
+2026-05-13 09:11:27 | INFO     | backend.text_extraction | Processeur OCR créé: projects/33551125540/locations/us/processors/92525d67f0492df7
+2026-05-13 09:11:27 | INFO     | backend.text_extraction | Document AI initialisé: processor=projects/33551125540/locations/us/processors/92525d67f0492df7
+2026-05-13 09:11:34 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (66886323) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:11:34 | INFO     | backend.text_extraction | Extraction : 10_PROTOCOLE_TOP_SOURCILS/PROTOCOLE_TOP_SOURCILS.pdf (0 chars)
+2026-05-13 09:11:34 | WARNING  | __main__ | Document vide après extraction: 10_PROTOCOLE_TOP_SOURCILS/PROTOCOLE_TOP_SOURCILS.pdf
+2026-05-13 09:11:34 | INFO     | __main__ | [2/23] 1_FORMATION_INITIALE /FORMATION_INITIALE.pdf
+2026-05-13 09:11:34 | INFO     | __main__ | Traitement: 1_FORMATION_INITIALE /FORMATION_INITIALE.pdf
+2026-05-13 09:11:34 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: 1_FORMATION_INITIALE /FORMATION_INITIALE.pdf
+2026-05-13 09:11:46 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (104904602) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:11:46 | INFO     | backend.text_extraction | Extraction : 1_FORMATION_INITIALE /FORMATION_INITIALE.pdf (0 chars)
+2026-05-13 09:11:46 | WARNING  | __main__ | Document vide après extraction: 1_FORMATION_INITIALE /FORMATION_INITIALE.pdf
+2026-05-13 09:11:46 | INFO     | __main__ | [3/23] 2_FORMATION_FACIALISTE /FORMATION_FACIALISTE.pdf
+2026-05-13 09:11:46 | INFO     | __main__ | Traitement: 2_FORMATION_FACIALISTE /FORMATION_FACIALISTE.pdf
+2026-05-13 09:11:46 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: 2_FORMATION_FACIALISTE /FORMATION_FACIALISTE.pdf
+2026-05-13 09:11:58 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (108642898) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:11:58 | INFO     | backend.text_extraction | Extraction : 2_FORMATION_FACIALISTE /FORMATION_FACIALISTE.pdf (0 chars)
+2026-05-13 09:11:58 | WARNING  | __main__ | Document vide après extraction: 2_FORMATION_FACIALISTE /FORMATION_FACIALISTE.pdf
+2026-05-13 09:11:58 | INFO     | __main__ | [4/23] 3_FORMATION_VENTE /FORMATION_VENTE.pdf
+2026-05-13 09:11:58 | INFO     | __main__ | Traitement: 3_FORMATION_VENTE /FORMATION_VENTE.pdf
+2026-05-13 09:11:58 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: 3_FORMATION_VENTE /FORMATION_VENTE.pdf
+2026-05-13 09:12:07 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (76199760) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:12:07 | INFO     | backend.text_extraction | Extraction : 3_FORMATION_VENTE /FORMATION_VENTE.pdf (0 chars)
+2026-05-13 09:12:07 | WARNING  | __main__ | Document vide après extraction: 3_FORMATION_VENTE /FORMATION_VENTE.pdf
+2026-05-13 09:12:07 | INFO     | __main__ | [5/23] 6_SKIN _MINUTE_ACADÉMY /SKIN_MINUTE_ACADEMY.pdf
+2026-05-13 09:12:07 | INFO     | __main__ | Traitement: 6_SKIN _MINUTE_ACADÉMY /SKIN_MINUTE_ACADEMY.pdf
+2026-05-13 09:12:07 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: 6_SKIN _MINUTE_ACADÉMY /SKIN_MINUTE_ACADEMY.pdf
+2026-05-13 09:12:22 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (140195316) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:12:22 | INFO     | backend.text_extraction | Extraction : 6_SKIN _MINUTE_ACADÉMY /SKIN_MINUTE_ACADEMY.pdf (0 chars)
+2026-05-13 09:12:22 | WARNING  | __main__ | Document vide après extraction: 6_SKIN _MINUTE_ACADÉMY /SKIN_MINUTE_ACADEMY.pdf
+2026-05-13 09:12:22 | INFO     | __main__ | [6/23] 7_BOOK_PRODUITS_VISAGE/BOOK_PRODUITS_VISAGE.pdf
+2026-05-13 09:12:22 | INFO     | __main__ | Traitement: 7_BOOK_PRODUITS_VISAGE/BOOK_PRODUITS_VISAGE.pdf
+2026-05-13 09:12:23 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: 7_BOOK_PRODUITS_VISAGE/BOOK_PRODUITS_VISAGE.pdf
+2026-05-13 09:12:33 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (95559070) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:12:33 | INFO     | backend.text_extraction | Extraction : 7_BOOK_PRODUITS_VISAGE/BOOK_PRODUITS_VISAGE.pdf (0 chars)
+2026-05-13 09:12:33 | WARNING  | __main__ | Document vide après extraction: 7_BOOK_PRODUITS_VISAGE/BOOK_PRODUITS_VISAGE.pdf
+2026-05-13 09:12:33 | INFO     | __main__ | [7/23] 8_POSE_CAPSULES AMÉRICAINE/POSE_CAPSULES_AMÉRICAINE.pdf
+2026-05-13 09:12:33 | INFO     | __main__ | Traitement: 8_POSE_CAPSULES AMÉRICAINE/POSE_CAPSULES_AMÉRICAINE.pdf
+2026-05-13 09:12:33 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: 8_POSE_CAPSULES AMÉRICAINE/POSE_CAPSULES_AMÉRICAINE.pdf
+2026-05-13 09:12:38 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (51672007) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:12:38 | INFO     | backend.text_extraction | Extraction : 8_POSE_CAPSULES AMÉRICAINE/POSE_CAPSULES_AMÉRICAINE.pdf (0 chars)
+2026-05-13 09:12:38 | WARNING  | __main__ | Document vide après extraction: 8_POSE_CAPSULES AMÉRICAINE/POSE_CAPSULES_AMÉRICAINE.pdf
+2026-05-13 09:12:38 | INFO     | __main__ | [8/23] BOOK_PRODUITS_CORPS.pdf
+2026-05-13 09:12:38 | INFO     | __main__ | Traitement: BOOK_PRODUITS_CORPS.pdf
+2026-05-13 09:12:39 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: BOOK_PRODUITS_CORPS.pdf
+2026-05-13 09:12:44 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (47618008) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:12:44 | INFO     | backend.text_extraction | Extraction : BOOK_PRODUITS_CORPS.pdf (0 chars)
+2026-05-13 09:12:44 | WARNING  | __main__ | Document vide après extraction: BOOK_PRODUITS_CORPS.pdf
+2026-05-13 09:12:44 | INFO     | __main__ | [9/23] PRODUITS_SKINMINUTE_CORPS/1-10_CORPS.pdf
+2026-05-13 09:12:44 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_CORPS/1-10_CORPS.pdf
+2026-05-13 09:12:44 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_CORPS/1-10_CORPS.pdf
+2026-05-13 09:12:56 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (112822074) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:12:56 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_CORPS/1-10_CORPS.pdf (0 chars)
+2026-05-13 09:12:56 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_CORPS/1-10_CORPS.pdf
+2026-05-13 09:12:56 | INFO     | __main__ | [10/23] PRODUITS_SKINMINUTE_CORPS/11-20_CORPS.pdf
+2026-05-13 09:12:56 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_CORPS/11-20_CORPS.pdf
+2026-05-13 09:12:56 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_CORPS/11-20_CORPS.pdf
+2026-05-13 09:13:08 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (114791558) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:13:08 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_CORPS/11-20_CORPS.pdf (0 chars)
+2026-05-13 09:13:08 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_CORPS/11-20_CORPS.pdf
+2026-05-13 09:13:08 | INFO     | __main__ | [11/23] PRODUITS_SKINMINUTE_CORPS/21-30_CORPS.pdf
+2026-05-13 09:13:08 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_CORPS/21-30_CORPS.pdf
+2026-05-13 09:13:09 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_CORPS/21-30_CORPS.pdf
+2026-05-13 09:13:20 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (114854502) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:13:20 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_CORPS/21-30_CORPS.pdf (0 chars)
+2026-05-13 09:13:20 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_CORPS/21-30_CORPS.pdf
+2026-05-13 09:13:20 | INFO     | __main__ | [12/23] PRODUITS_SKINMINUTE_CORPS/31-35_CORPS.pdf
+2026-05-13 09:13:20 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_CORPS/31-35_CORPS.pdf
+2026-05-13 09:13:21 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_CORPS/31-35_CORPS.pdf
+2026-05-13 09:13:28 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (68709221) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:13:28 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_CORPS/31-35_CORPS.pdf (0 chars)
+2026-05-13 09:13:28 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_CORPS/31-35_CORPS.pdf
+2026-05-13 09:13:28 | INFO     | __main__ | [13/23] PRODUITS_SKINMINUTE_VISAGE/1-5_VISAGE.pdf
+2026-05-13 09:13:28 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/1-5_VISAGE.pdf
+2026-05-13 09:13:28 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/1-5_VISAGE.pdf
+2026-05-13 09:13:34 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (57087690) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:13:34 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/1-5_VISAGE.pdf (0 chars)
+2026-05-13 09:13:34 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/1-5_VISAGE.pdf
+2026-05-13 09:13:34 | INFO     | __main__ | [14/23] PRODUITS_SKINMINUTE_VISAGE/11-15_VISAGE.pdf
+2026-05-13 09:13:34 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/11-15_VISAGE.pdf
+2026-05-13 09:13:34 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/11-15_VISAGE.pdf
+2026-05-13 09:13:40 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (57690482) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:13:40 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/11-15_VISAGE.pdf (0 chars)
+2026-05-13 09:13:40 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/11-15_VISAGE.pdf
+2026-05-13 09:13:40 | INFO     | __main__ | [15/23] PRODUITS_SKINMINUTE_VISAGE/16-21_VISAGE.pdf
+2026-05-13 09:13:40 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/16-21_VISAGE.pdf
+2026-05-13 09:13:41 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/16-21_VISAGE.pdf
+2026-05-13 09:13:48 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (73743722) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:13:48 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/16-21_VISAGE.pdf (0 chars)
+2026-05-13 09:13:48 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/16-21_VISAGE.pdf
+2026-05-13 09:13:48 | INFO     | __main__ | [16/23] PRODUITS_SKINMINUTE_VISAGE/22-27_VIAGE.pdf
+2026-05-13 09:13:48 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/22-27_VIAGE.pdf
+2026-05-13 09:13:49 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/22-27_VIAGE.pdf
+2026-05-13 09:13:56 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (73810015) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:13:56 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/22-27_VIAGE.pdf (0 chars)
+2026-05-13 09:13:56 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/22-27_VIAGE.pdf
+2026-05-13 09:13:56 | INFO     | __main__ | [17/23] PRODUITS_SKINMINUTE_VISAGE/28-34_VISAGE.pdf
+2026-05-13 09:13:56 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/28-34_VISAGE.pdf
+2026-05-13 09:13:57 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/28-34_VISAGE.pdf
+2026-05-13 09:14:05 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (87443418) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:14:05 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/28-34_VISAGE.pdf (0 chars)
+2026-05-13 09:14:05 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/28-34_VISAGE.pdf
+2026-05-13 09:14:05 | INFO     | __main__ | [18/23] PRODUITS_SKINMINUTE_VISAGE/35-40_VISAGE.pdf
+2026-05-13 09:14:05 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/35-40_VISAGE.pdf
+2026-05-13 09:14:06 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/35-40_VISAGE.pdf
+2026-05-13 09:14:13 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (75917894) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:14:13 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/35-40_VISAGE.pdf (0 chars)
+2026-05-13 09:14:13 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/35-40_VISAGE.pdf
+2026-05-13 09:14:13 | INFO     | __main__ | [19/23] PRODUITS_SKINMINUTE_VISAGE/41-45_VISAGE.pdf
+2026-05-13 09:14:13 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/41-45_VISAGE.pdf
+2026-05-13 09:14:14 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/41-45_VISAGE.pdf
+2026-05-13 09:14:21 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (67423241) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:14:21 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/41-45_VISAGE.pdf (0 chars)
+2026-05-13 09:14:21 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/41-45_VISAGE.pdf
+2026-05-13 09:14:21 | INFO     | __main__ | [20/23] PRODUITS_SKINMINUTE_VISAGE/46-50.pdf
+2026-05-13 09:14:21 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/46-50.pdf
+2026-05-13 09:14:21 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/46-50.pdf
+2026-05-13 09:14:28 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (67062534) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:14:28 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/46-50.pdf (0 chars)
+2026-05-13 09:14:28 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/46-50.pdf
+2026-05-13 09:14:28 | INFO     | __main__ | [21/23] PRODUITS_SKINMINUTE_VISAGE/51-55_VISAGE.pdf
+2026-05-13 09:14:28 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/51-55_VISAGE.pdf
+2026-05-13 09:14:28 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/51-55_VISAGE.pdf
+2026-05-13 09:14:35 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (72872822) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:14:35 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/51-55_VISAGE.pdf (0 chars)
+2026-05-13 09:14:35 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/51-55_VISAGE.pdf
+2026-05-13 09:14:35 | INFO     | __main__ | [22/23] PRODUITS_SKINMINUTE_VISAGE/56-57_VISAGE.pdf
+2026-05-13 09:14:35 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/56-57_VISAGE.pdf
+2026-05-13 09:14:36 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/56-57_VISAGE.pdf
+[DEBUG] OCR Document AI pour: 10_PROTOCOLE_TOP_SOURCILS/PROTOCOLE_TOP_SOURCILS.pdf
+[DEBUG] Envoi à Document AI: 66886323 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (66886323) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour 10_PROTOCOLE_TOP_SOURCILS/PROTOCOLE_TOP_SOURCILS.pdf
+[DEBUG] OCR Document AI pour: 1_FORMATION_INITIALE /FORMATION_INITIALE.pdf
+[DEBUG] Envoi à Document AI: 104904602 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (104904602) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour 1_FORMATION_INITIALE /FORMATION_INITIALE.pdf
+[DEBUG] OCR Document AI pour: 2_FORMATION_FACIALISTE /FORMATION_FACIALISTE.pdf
+[DEBUG] Envoi à Document AI: 108642898 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (108642898) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour 2_FORMATION_FACIALISTE /FORMATION_FACIALISTE.pdf
+[DEBUG] OCR Document AI pour: 3_FORMATION_VENTE /FORMATION_VENTE.pdf
+[DEBUG] Envoi à Document AI: 76199760 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (76199760) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour 3_FORMATION_VENTE /FORMATION_VENTE.pdf
+[DEBUG] OCR Document AI pour: 6_SKIN _MINUTE_ACADÉMY /SKIN_MINUTE_ACADEMY.pdf
+[DEBUG] Envoi à Document AI: 140195316 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (140195316) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour 6_SKIN _MINUTE_ACADÉMY /SKIN_MINUTE_ACADEMY.pdf
+[DEBUG] OCR Document AI pour: 7_BOOK_PRODUITS_VISAGE/BOOK_PRODUITS_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 95559070 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (95559070) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour 7_BOOK_PRODUITS_VISAGE/BOOK_PRODUITS_VISAGE.pdf
+[DEBUG] OCR Document AI pour: 8_POSE_CAPSULES AMÉRICAINE/POSE_CAPSULES_AMÉRICAINE.pdf
+[DEBUG] Envoi à Document AI: 51672007 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (51672007) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour 8_POSE_CAPSULES AMÉRICAINE/POSE_CAPSULES_AMÉRICAINE.pdf
+[DEBUG] OCR Document AI pour: BOOK_PRODUITS_CORPS.pdf
+[DEBUG] Envoi à Document AI: 47618008 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (47618008) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour BOOK_PRODUITS_CORPS.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_CORPS/1-10_CORPS.pdf
+[DEBUG] Envoi à Document AI: 112822074 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (112822074) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_CORPS/1-10_CORPS.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_CORPS/11-20_CORPS.pdf
+[DEBUG] Envoi à Document AI: 114791558 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (114791558) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_CORPS/11-20_CORPS.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_CORPS/21-30_CORPS.pdf
+[DEBUG] Envoi à Document AI: 114854502 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (114854502) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_CORPS/21-30_CORPS.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_CORPS/31-35_CORPS.pdf
+[DEBUG] Envoi à Document AI: 68709221 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (68709221) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_CORPS/31-35_CORPS.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/1-5_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 57087690 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (57087690) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/1-5_VISAGE.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/11-15_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 57690482 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (57690482) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/11-15_VISAGE.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/16-21_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 73743722 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (73743722) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/16-21_VISAGE.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/22-27_VIAGE.pdf
+[DEBUG] Envoi à Document AI: 73810015 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (73810015) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/22-27_VIAGE.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/28-34_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 87443418 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (87443418) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/28-34_VISAGE.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/35-40_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 75917894 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (75917894) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/35-40_VISAGE.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/41-45_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 67423241 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (67423241) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/41-45_VISAGE.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/46-50.pdf
+[DEBUG] Envoi à Document AI: 67062534 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (67062534) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/46-50.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/51-55_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 72872822 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (72872822) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/51-55_VISAGE.pdf
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/56-57_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 28787884 bytes
+2026-05-13 09:14:45 | INFO     | backend.text_extraction | Extraction [DocAI]: PRODUITS_SKINMINUTE_VISAGE/56-57_VISAGE.pdf (3343 chars)
+2026-05-13 09:14:45 | INFO     | backend.chunking | Chunking terminé: PRODUITS_SKINMINUTE_VISAGE/56-57_VISAGE.pdf -> 6 chunks
+2026-05-13 09:14:45 | INFO     | __main__ | Document traité: 6 chunks créés
+2026-05-13 09:14:45 | INFO     | __main__ | [23/23] PRODUITS_SKINMINUTE_VISAGE/6-10_VISAGE.pdf
+2026-05-13 09:14:45 | INFO     | __main__ | Traitement: PRODUITS_SKINMINUTE_VISAGE/6-10_VISAGE.pdf
+2026-05-13 09:14:45 | INFO     | backend.text_extraction | PDF scanné détecté, OCR Document AI: PRODUITS_SKINMINUTE_VISAGE/6-10_VISAGE.pdf
+2026-05-13 09:14:51 | ERROR    | backend.text_extraction | Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (61406383) exceeds the limit: 41943040."
+}
+]
+2026-05-13 09:14:51 | INFO     | backend.text_extraction | Extraction : PRODUITS_SKINMINUTE_VISAGE/6-10_VISAGE.pdf (0 chars)
+2026-05-13 09:14:51 | WARNING  | __main__ | Document vide après extraction: PRODUITS_SKINMINUTE_VISAGE/6-10_VISAGE.pdf
+2026-05-13 09:14:51 | INFO     | __main__ | Génération embeddings pour 6 chunks...
+2026-05-13 09:14:51 | INFO     | backend.embeddings_client | Batch 1/1: 6 textes
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform_v1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform_v1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform_v1beta1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform_v1beta1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform.v1.schema.predict.instance_v1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform.v1.schema.predict.instance_v1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform.v1.schema.predict.params_v1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform.v1.schema.predict.params_v1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform.v1.schema.predict.prediction_v1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform.v1.schema.predict.prediction_v1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform.v1.schema.trainingjob.definition_v1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform.v1.schema.trainingjob.definition_v1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform.v1beta1.schema.predict.instance_v1beta1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform.v1beta1.schema.predict.instance_v1beta1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform.v1beta1.schema.predict.params_v1beta1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform.v1beta1.schema.predict.params_v1beta1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform.v1beta1.schema.predict.prediction_v1beta1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform.v1beta1.schema.predict.prediction_v1beta1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.19) which Google will stop supporting in new releases of google.cloud.aiplatform.v1beta1.schema.trainingjob.definition_v1beta1 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.aiplatform.v1beta1.schema.trainingjob.definition_v1beta1 past that date.
+  warnings.warn(message, FutureWarning)
+/opt/conda/lib/python3.10/site-packages/vertexai/_model_garden/_model_garden_models.py:278: UserWarning: This feature is deprecated as of June 24, 2025 and will be removed on June 24, 2026. For details, see https://cloud.google.com/vertex-ai/generative-ai/docs/deprecations/genai-vertexai-sdk.
+  warning_logs.show_deprecation_warning()
+2026-05-13 09:14:57 | INFO     | backend.embeddings_client | Embedding terminé: 6 vecteurs générés
+2026-05-13 09:14:57 | INFO     | httpx | HTTP Request: PUT https://2d47e34f-2faf-40b5-87a9-03f4b06a6cd5.europe-west3-0.gcp.cloud.qdrant.io:6333/collections/mina_documents/points?wait=true "HTTP/1.1 200 OK"
+2026-05-13 09:14:57 | INFO     | backend.qdrant_client | 6 points insérés dans Qdrant
+2026-05-13 09:14:57 | INFO     | __main__ | ============================================================
+2026-05-13 09:14:57 | INFO     | __main__ | PIPELINE TERMINÉ
+2026-05-13 09:14:57 | INFO     | __main__ | Statistiques: {'duration_seconds': 215.62, 'documents_processed': 23, 'documents_failed': 0, 'chunks_created': 6, 'vectors_inserted': 6, 'success_rate': '100.0%', 'errors_count': 0}
+2026-05-13 09:14:57 | INFO     | __main__ | ============================================================
+[DEBUG] Document AI retourne: 3344 chars
+[DEBUG] OCR succès: 3343 chars
+[DEBUG] OCR Document AI pour: PRODUITS_SKINMINUTE_VISAGE/6-10_VISAGE.pdf
+[DEBUG] Envoi à Document AI: 61406383 bytes
+[DEBUG] Erreur Document AI: 400 Request contains an invalid argument. [field_violations {
+  field: "raw_document.content"
+  description: "Document size (61406383) exceeds the limit: 41943040."
+}
+]
+[DEBUG] OCR échec pour PRODUITS_SKINMINUTE_VISAGE/6-10_VISAGE.pdf

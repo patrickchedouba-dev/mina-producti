@@ -65,17 +65,16 @@ class LLMProvider(ABC):
 class GeminiProvider(LLMProvider):
     """Provider Google Gemini avec retry automatique."""
     
-    def __init__(self, model: str = "gemini-2.0-flash-exp"):
+    def __init__(self, model: str = "gemini-2.5-flash"):
         from google import genai
         
-        api_key = os.getenv("GOOGLE_API_KEY")
-        if not api_key:
-            raise ValueError("GOOGLE_API_KEY not set")
-        
-        genai.configure(api_key=api_key)
+        self._client = genai.Client(
+            vertexai=True,
+            project=os.getenv("GOOGLE_CLOUD_PROJECT", "bodycoachocr"),
+            location=os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+        )
         self._model_name = model
-        self._model = genai.GenerativeModel(model)
-        logger.info(f"🤖 GeminiProvider initialisé: {model}")
+        logger.info(f"🤖 GeminiProvider (Vertex AI) initialisé: {model}")
     
     async def generate(
         self,
@@ -108,12 +107,6 @@ class GeminiProvider(LLMProvider):
         if tools:
             gemini_tools = [{"function_declarations": tools}]
         
-        # Générer avec timeout de 30 secondes
-        config = {
-            "temperature": temperature,
-            "max_output_tokens": max_tokens
-        }
-        
         logger.debug(f"🔄 Gemini call: {len(prompt)} chars")
         
         # P0 FIX: Timeout 30s pour éviter blocage indéfini
@@ -131,10 +124,15 @@ class GeminiProvider(LLMProvider):
             pass  # Windows ou thread non-main
         
         try:
-            response = self._model.generate_content(
-                prompt,
-                tools=gemini_tools,
-                generation_config=config
+            from google.genai import types
+            response = self._client.models.generate_content(
+                model=self._model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=temperature,
+                    max_output_tokens=max_tokens,
+                    tools=gemini_tools
+                )
             )
         finally:
             # Reset alarm
@@ -336,7 +334,7 @@ def get_llm_provider(provider: str = None) -> LLMProvider:
         return _providers[provider]
     
     if provider == "gemini":
-        model = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp")
+        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         _providers[provider] = GeminiProvider(model)
     elif provider == "claude":
         model = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")

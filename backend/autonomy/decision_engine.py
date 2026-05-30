@@ -12,8 +12,10 @@ via un prompt XML structuré et retourne une décision JSON.
 
 import json
 import logging
+import os
 import re
 from dataclasses import dataclass, field, asdict
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict
 
@@ -145,7 +147,7 @@ class DecisionEngine:
             response = provider.generate_sync(
                 messages=messages,
                 temperature=0.1,
-                max_tokens=500,
+                max_tokens=4096,
             )
             decision = self._parse_llm_response(response.text, niveau_assigne)
         except Exception as exc:
@@ -168,37 +170,46 @@ class DecisionEngine:
         return decision
 
     def _parse_llm_response(self, text: str, fallback_niveau: str) -> Decision:
-        """Parse la réponse JSON du LLM en Decision."""
-        json_match = re.search(r'\{[^{}]*\}', text, re.DOTALL)
-        if not json_match:
-            return Decision(
-                agir=False,
-                niveau=Niveau.ALERTE,
-                action="Réponse LLM non parseable",
-                justification=f"Texte brut: {text[:200]}",
-            )
+        """Parse la réponse LLM en Decision. Gère les blocs markdown Gemini."""
+        import re as _re
 
+        # Nettoyer bloc markdown Gemini (```json ... ```)
+        clean = text
+        clean = _re.sub(r'```json', '', clean)
+        clean = _re.sub(r'```', '', clean)
+        clean = clean.strip()
+
+        # Extraire le JSON
         try:
-            data = json.loads(json_match.group())
+            data = json.loads(clean)
         except json.JSONDecodeError:
-            return Decision(
-                agir=False,
-                niveau=Niveau.ALERTE,
-                action="JSON invalide dans la réponse LLM",
-                justification=f"Texte brut: {text[:200]}",
-            )
-
-        niveau_str = data.get("niveau", fallback_niveau).upper()
-        try:
-            niveau = Niveau(niveau_str)
-        except ValueError:
-            niveau = Niveau.ALERTE
+            # Fallback: chercher un objet JSON dans le texte
+            json_match = _re.search(r'\{[^`]*\}', clean, _re.DOTALL)
+            if not json_match:
+                return Decision(
+                    agir=False,
+                    niveau=Niveau(fallback_niveau),
+                    action="Réponse LLM non parseable",
+                    justification=f"Texte brut: {text[:200]}",
+                    metadata={}
+                )
+            try:
+                data = json.loads(json_match.group())
+            except json.JSONDecodeError:
+                return Decision(
+                    agir=False,
+                    niveau=Niveau(fallback_niveau),
+                    action="JSON invalide",
+                    justification=f"Texte brut: {text[:200]}",
+                    metadata={}
+                )
 
         return Decision(
-            agir=bool(data.get("agir", False)),
-            niveau=niveau,
+            agir=data.get("agir", False),
+            niveau=Niveau(data.get("niveau", fallback_niveau)),
             action=data.get("action", ""),
             justification=data.get("justification", ""),
+            metadata=data.get("metadata", {})
         )
 
     # ------------------------------------------------------------------
@@ -232,6 +243,7 @@ class DecisionEngine:
 
         elif decision.niveau == Niveau.ALERTE:
             result["resultat"] = "alerte_envoyee"
+            self._dispatch_alerte(decision)
             logger.info("🚨 ALERTE envoyée: %s", decision.action[:80])
 
         else:
@@ -239,3 +251,30 @@ class DecisionEngine:
             logger.info("⏸️ Abstention: %s", decision.justification[:80])
 
         return result
+
+    def _dispatch_alerte(self, decision: Decision):
+        """Émet une alerte : log structuré JSON + webhook optionnel (ALERT_WEBHOOK_URL)."""
+        payload = {
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "niveau": "ALERTE",
+            "action": decision.action,
+            "justification": decision.justification,
+        }
+        # Log structuré toujours visible dans journald
+        logger.warning("ALERTE_STRUCTUREE %s", json.dumps(payload, ensure_ascii=False))
+
+        webhook_url = os.getenv("ALERT_WEBHOOK_URL", "")
+        if not webhook_url:
+            return
+        try:
+            import urllib.request
+            data = json.dumps(payload, ensure_ascii=False).encode()
+            req = urllib.request.Request(
+                webhook_url,
+                data=data,
+                headers={"Content-Type": "application/json"},
+            )
+            urllib.request.urlopen(req, timeout=5)
+            logger.info("🚨 Webhook ALERTE envoyé → %s", webhook_url)
+        except Exception as exc:
+            logger.error("Échec webhook ALERTE: %s", exc)

@@ -15,16 +15,29 @@ from .triggers import ALL_TRIGGERS, BaseTrigger
 
 logger = logging.getLogger(__name__)
 
+# Singleton StateStore injecté depuis run.py avant le démarrage du scheduler.
+_GLOBAL_STATE_STORE = None
+
 
 def _run_trigger(trigger_id: str, engine=None):
     """Fonction sérialisable par APScheduler pour exécuter un trigger."""
+    from datetime import datetime, timezone
     from backend.autonomy.triggers import ALL_TRIGGERS
     from backend.autonomy.decision_engine import DecisionEngine
+
     trigger = next((t for t in ALL_TRIGGERS if t.id == trigger_id), None)
     if trigger is None:
         return
     if engine is None:
         engine = DecisionEngine()
+
+    if _GLOBAL_STATE_STORE is not None:
+        _GLOBAL_STATE_STORE.set(
+            f"{trigger_id}:last_run",
+            datetime.now(timezone.utc).isoformat(),
+            ttl=None,
+        )
+
     trigger.run(engine)
 
 

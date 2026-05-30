@@ -23,7 +23,14 @@ def main():
     db_url = os.getenv("DATABASE_URL", os.getenv("POSTGRES_URL", "sqlite:///mina_jobs.db"))
     logger.info("🔧 DATABASE_URL = %s", db_url[:40] + "..." if len(db_url) > 40 else db_url)
 
+    from .state_store import StateStore
     from .scheduler import AutonomyScheduler
+    import backend.autonomy.scheduler as sched_module
+
+    store = StateStore()
+    sched_module._GLOBAL_STATE_STORE = store
+    logger.info("🗄️ StateStore initialisé (Redis=%s, PG=%s)",
+                bool(store._redis_url), bool(store._pg_url))
 
     scheduler = AutonomyScheduler(database_url=db_url)
     scheduler.register_all()

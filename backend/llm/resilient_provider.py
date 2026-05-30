@@ -49,7 +49,7 @@ class ResilientLLMProvider:
     
     def __init__(
         self,
-        gemini_model: str = "gemini-2.0-flash-exp",
+        gemini_model: str = "gemini-2.5-flash",
         claude_model: str = "claude-3-haiku-20240307"
     ):
         """

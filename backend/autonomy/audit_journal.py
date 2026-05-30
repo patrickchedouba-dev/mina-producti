@@ -27,12 +27,25 @@ CREATE TABLE IF NOT EXISTS audit_journal (
     ts          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     trigger_id  VARCHAR(64),
     signal      TEXT,
-    decision    VARCHAR(16),
-    niveau      VARCHAR(16),
+    decision    VARCHAR(32),
+    niveau      VARCHAR(32),
     action      TEXT,
-    resultat    VARCHAR(16),
+    resultat    VARCHAR(32),
     detail      JSONB
 );
+"""
+
+_ALTER_COLUMNS_SQL = """
+DO $$
+BEGIN
+    BEGIN
+        ALTER TABLE audit_journal
+            ALTER COLUMN decision TYPE VARCHAR(32),
+            ALTER COLUMN niveau   TYPE VARCHAR(32),
+            ALTER COLUMN resultat TYPE VARCHAR(32);
+    EXCEPTION WHEN others THEN NULL;
+    END;
+END$$;
 """
 
 _INSERT_SQL = """
@@ -82,7 +95,7 @@ class AuditJournal:
             return None
 
     def _ensure_table(self):
-        """Crée la table si nécessaire."""
+        """Crée la table si nécessaire et migre les colonnes VARCHAR(16) → VARCHAR(32)."""
         if self._table_ready:
             return
         conn = self._get_connection()
@@ -90,6 +103,7 @@ class AuditJournal:
             try:
                 cur = conn.cursor()
                 cur.execute(_CREATE_TABLE_SQL)
+                cur.execute(_ALTER_COLUMNS_SQL)
                 cur.close()
                 self._table_ready = True
             except Exception as exc:

@@ -175,32 +175,56 @@ class MinaOrchestratorV2:
             return {}
     
     def _route_to_agents(self, user_input: str, institut_id: Optional[str] = None) -> AgentDecision:
-        """
-        Détermine quel(s) agent(s) appeler.
-        
-        Utilise les policies apprises si disponibles.
-        """
+        """Routing intelligent par LLM. Fallback regex si LLM indisponible."""
+        RECOMMENDATION_KEYWORDS = r"soin|produit|actif|ingrédient|cure|protocole|formation|kobido|lift|silhouette|crème|sérum"
         input_lower = user_input.lower()
         policy = self._get_institut_policy(institut_id)
-        
-        # Base routing
-        for pattern, agents in self._routing_rules:
-            if re.search(pattern, input_lower):
-                # Apply policy adjustments if available
-                adjusted_agents = self._apply_policy_to_agents(agents, policy, input_lower)
-                
-                return AgentDecision(
-                    agents=adjusted_agents,
-                    reasoning=f"Pattern matched: {pattern}" + (f" (policy: {institut_id})" if policy else ""),
-                    priority=1
-                )
-        
-        # Fallback: conversation
-        return AgentDecision(
-            agents=["conversation"],
-            reasoning="Default fallback",
-            priority=1
-        )
+
+        routing_prompt = f"""Tu es le superviseur de MINA, assistante IA pour les instituts Body Minute.
+
+Question reçue : "{user_input}"
+
+Contraintes institut : {json.dumps(policy.get('routing', {}), ensure_ascii=False) if policy else 'aucune'}
+
+Choisis les agents à mobiliser parmi cette liste :
+- conversation : accueil, politesse, questions générales
+- diagnosis : analyse de problème de peau, diagnostic beauté
+- recommendation : produits, soins, actifs, ingrédients, cures, protocoles Body Minute
+- booking : rendez-vous, disponibilités, horaires
+- memory : historique client, préférences, profil
+
+RÈGLE ABSOLUE : si la question mentionne un produit, soin, actif, ingrédient, cure, protocole ou formation Body Minute → tu DOIS inclure "recommendation".
+
+Réponds UNIQUEMENT avec les noms d'agents séparés par des virgules. Exemple : recommendation,conversation"""
+
+        try:
+            messages = [{"role": "user", "content": routing_prompt}]
+            response = self._llm.generate_sync(messages, max_tokens=1024)
+            raw = response.text.strip().lower() if response.text else ""
+
+            valid_agents = {"conversation", "diagnosis", "recommendation", "booking", "memory"}
+            agents = [a.strip() for a in raw.split(",") if a.strip() in valid_agents]
+
+            if not agents:
+                agents = ["conversation"]
+
+            # Post-processing : garantit RÈGLE ABSOLUE indépendamment du LLM
+            if re.search(RECOMMENDATION_KEYWORDS, input_lower) and "recommendation" not in agents:
+                agents.insert(0, "recommendation")
+
+            logger.info(f"🧠 [LLM ROUTING] '{user_input[:40]}' → {agents}")
+            return AgentDecision(agents=agents, reasoning=f"LLM: {raw}", priority=1)
+
+        except Exception as e:
+            logger.warning(f"⚠️ LLM routing échoué: {e} — fallback regex")
+            for pattern, regex_agents in self._routing_rules:
+                if re.search(pattern, input_lower):
+                    adjusted = self._apply_policy_to_agents(regex_agents, policy, input_lower)
+                    # Post-processing : garantit RÈGLE ABSOLUE dans le fallback aussi
+                    if re.search(RECOMMENDATION_KEYWORDS, input_lower) and "recommendation" not in adjusted:
+                        adjusted.insert(0, "recommendation")
+                    return AgentDecision(agents=adjusted, reasoning=f"Regex fallback: {pattern}", priority=1)
+            return AgentDecision(agents=["conversation"], reasoning="Default fallback", priority=1)
     
     def _apply_policy_to_agents(self, agents: List[str], policy: Dict, user_input: str) -> List[str]:
         """
@@ -279,7 +303,7 @@ Réponds en 2-3 phrases maximum, ton chaleureux, tutoyant.
         
         tools_map = {
             "diagnosis": ("analyze_skin_image", None),
-            "recommendation": ("search_knowledge", {"query": user_input, "collection": "bodyminute_products"}),
+            "recommendation": ("search_knowledge", {"query": user_input, "collection": "mina_documents"}),
             "memory": ("get_client_context", None),
         }
         
@@ -341,13 +365,14 @@ Réponds en 2-3 phrases maximum, ton chaleureux, tutoyant.
         # === T1: Context Load ===
         t1 = time.perf_counter()
         import asyncio
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        context = loop.run_until_complete(
+        import concurrent.futures
+
+        def _run_async(coro):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(asyncio.run, coro)
+                return future.result()
+
+        context = _run_async(
             self.load_context(session_id, client_id, institut_id)
         )
         timings["context_load"] = int((time.perf_counter() - t1) * 1000)

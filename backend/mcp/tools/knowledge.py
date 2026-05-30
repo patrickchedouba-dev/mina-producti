@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 def search_knowledge(
     query: str,
-    collection: str = "bodyminute_docs",
+    collection: str = "mina_documents",
     limit: int = 3,
     score_threshold: float = 0.5
 ) -> Dict[str, Any]:
@@ -48,12 +48,12 @@ def search_knowledge(
         
         # Recherche dans Qdrant
         qdrant = get_qdrant_client()
-        results = qdrant.search(
+        results = qdrant.client.query_points(
             collection_name=collection,
-            query_vector=query_vector,
+            query=query_vector,
             limit=limit,
             score_threshold=score_threshold
-        )
+        ).points
         
         # Formater les résultats
         formatted_results = []
@@ -103,8 +103,8 @@ TOOL_METADATA = {
             },
             "collection": {
                 "type": "string",
-                "enum": ["bodyminute_docs", "bodyminute_products"],
-                "description": "Collection à chercher. 'bodyminute_products' pour les produits, 'bodyminute_docs' pour les protocoles et documentation."
+                "enum": ["mina_documents"],
+                "description": "Collection Qdrant à chercher."
             },
             "limit": {
                 "type": "integer",

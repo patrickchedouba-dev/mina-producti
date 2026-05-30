@@ -9,10 +9,13 @@ Endpoints:
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional, List
 import logging
 import os
+import pathlib
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger(__name__)
@@ -31,6 +34,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Servir les fichiers frontend
+_BASE_DIR = pathlib.Path(__file__).parent.parent
+app.mount("/static", StaticFiles(directory=str(_BASE_DIR / "static")), name="static")
+app.mount("/frontend", StaticFiles(directory=str(_BASE_DIR / "frontend")), name="frontend")
 
 
 class ConversationRequest(BaseModel):
@@ -169,12 +177,9 @@ async def get_experiments(institut_id: str):
 
 @app.get("/")
 async def root():
-    """Endpoint racine"""
-    return {
-        "message": "Mina API v2.0",
-        "docs": "/docs",
-        "health": "/health",
-        "metrics": "/metrics",
-        "regret": "/regret/insights/{institut_id}"
-    }
+    """Interface bêta MINA"""
+    beta_path = _BASE_DIR / "frontend" / "mina_beta.html"
+    if beta_path.exists():
+        return FileResponse(str(beta_path))
+    return {"message": "Mina API v2.0", "docs": "/docs", "health": "/health"}
 

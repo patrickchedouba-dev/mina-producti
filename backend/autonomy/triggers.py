@@ -4,10 +4,10 @@ Déclencheurs Phase 1 — MINA Autonomie L6.
 5 triggers avec leurs schedules APScheduler et niveaux d'autonomie.
 """
 
+import json
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from .decision_engine import DecisionEngine, Niveau
 
@@ -21,6 +21,12 @@ class BaseTrigger(ABC):
     schedule_type: str = "interval"  # "interval" ou "cron"
     schedule_args: Dict[str, Any] = {}
     niveau: Niveau = Niveau.ALERTE
+
+    def __init__(self, journal=None):
+        if journal is None:
+            from .audit_journal import AuditJournal
+            journal = AuditJournal()
+        self._journal = journal
 
     @abstractmethod
     def build_signal(self) -> Dict[str, Any]:
@@ -37,6 +43,16 @@ class BaseTrigger(ABC):
 
         decision = engine.evaluer(signal)
         result = engine.executer(decision)
+
+        self._journal.log_action(
+            trigger_id=self.id,
+            signal=json.dumps(signal, ensure_ascii=False, default=str)[:500],
+            decision="agir" if decision.agir else "abstention",
+            niveau=decision.niveau.value,
+            action=decision.action,
+            resultat=result["resultat"],
+            detail={"justification": decision.justification, "metadata": decision.metadata},
+        )
 
         logger.info("🔁 Trigger [%s] terminé → %s", self.id, result.get("resultat"))
         return result
@@ -97,15 +113,41 @@ class RelanceInactives(BaseTrigger):
     schedule_args = {"hour": 10, "minute": 0}
     niveau = Niveau.PROPOSE
 
+    def _query_inactive_count(self) -> int:
+        """Compte les clientes sans visite depuis 42 jours via SQL."""
+        import os
+        pg_url = os.getenv("DATABASE_URL", os.getenv("POSTGRES_URL", ""))
+        if not pg_url or "sqlite" in pg_url:
+            logger.warning("RelanceInactives: DATABASE_URL absent ou SQLite — count=0")
+            return 0
+        try:
+            import psycopg2
+            conn = psycopg2.connect(pg_url)
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT COUNT(*) FROM clients "
+                "WHERE last_visit < NOW() - INTERVAL '42 days'"
+            )
+            count = cur.fetchone()[0]
+            cur.close()
+            conn.close()
+            return count
+        except Exception as exc:
+            logger.warning("RelanceInactives: requête SQL échouée: %s", exc)
+            return 0
+
     def build_signal(self) -> Dict[str, Any]:
+        count = self._query_inactive_count()
         return {
             "description": (
-                "Identifier les clientes sans visite depuis 6 semaines "
-                "et préparer un message de relance personnalisé."
+                f"Identifier les clientes sans visite depuis 6 semaines "
+                f"et préparer un message de relance personnalisé. "
+                f"{count} cliente(s) éligible(s) identifiée(s)."
             ),
             "contexte": {
                 "seuil_inactivite_jours": 42,
                 "action_type": "SMS ou email personnalisé",
+                "count_eligibles": count,
             },
         }
 
