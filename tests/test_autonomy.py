@@ -28,11 +28,12 @@ from backend.autonomy.scheduler import AutonomyScheduler
 
 def test_audit_journal_log(tmp_path):
     """L'AuditJournal enregistre une action et la retrouve."""
-    # Patcher le fallback path pour utiliser tmp_path
     fallback = tmp_path / "audit_test.json"
 
     with patch("backend.autonomy.audit_journal._FALLBACK_PATH", fallback):
-        journal = AuditJournal(postgres_url="")  # Force fallback JSON
+        # Forcer explicitement le mode JSON en passant une URL invalide
+        journal = AuditJournal(postgres_url="invalid://")
+        journal._pg_conn = None  # S'assurer que PG est désactivé
 
         entry = journal.log_action(
             trigger_id="test_trigger",
@@ -44,7 +45,6 @@ def test_audit_journal_log(tmp_path):
             detail={"test": True},
         )
 
-        # L'entrée doit contenir les champs requis
         assert entry["trigger_id"] == "test_trigger"
         assert entry["signal"] == "Signal de test"
         assert entry["decision"] == "agir"
@@ -52,9 +52,8 @@ def test_audit_journal_log(tmp_path):
         assert entry["action"] == "Action de test"
         assert entry["resultat"] == "succes"
         assert "ts" in entry
-
-        # Le fichier JSON doit contenir l'entrée
         assert fallback.exists()
+        import json
         data = json.loads(fallback.read_text())
         assert len(data) == 1
         assert data[0]["trigger_id"] == "test_trigger"
