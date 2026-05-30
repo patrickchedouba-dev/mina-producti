@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Configuration Body Minute - Constantes, couleurs, FAQ, conseils saisonniers.
+Configuration Body Minute — Constantes, couleurs, configuration LLM/TTS.
 Module centralisé pour toutes les configurations de l'application Body Touch.
+CDC V4.0 Ch.25 : aucun contenu textuel hardcodé.
 """
 
 import os
-from datetime import datetime
 
 # =============================================================================
 # COULEURS BODY MINUTE
@@ -24,24 +24,14 @@ GRIS_CLAIR = "#b0b0b0"
 COLLECTION_PRODUCTS = os.getenv("QDRANT_COLLECTION_NAME", "bodyminute_docs")
 
 # =============================================================================
-# FAQ BYPASS - Réponses instantanées (skip RAG+LLM)
+# DÉTECTION SALUTATIONS SOCIALES (remplace FAQ_BYPASS — CDC V4.0 Ch.25)
 # =============================================================================
 
-    "bonjour": "Bonjour ! Comment puis-je t'aider aujourd'hui ?",
-    "salut": "Salut ! Qu'est-ce qui te ferait plaisir ?",
-    "merci": "Avec plaisir ! Autre chose ?",
-    "au revoir": "À bientôt ! Prends soin de toi !",
-    "bye": "À très vite !",
-    "horaires": "On est ouvert du lundi au samedi, 9h-19h. Tu veux prendre RDV ?",
-    "ouvert": "On est ouvert du lundi au samedi, 9h-19h. Tu veux prendre RDV ?",
-    "rdv": "Pour prendre rendez-vous, appelle ton institut ou utilise l'appli Body Minute !",
-    "rendez-vous": "Pour prendre rendez-vous, appelle ton institut ou utilise l'appli Body Minute !",
-    "prix": "Les prix varient selon les soins. Tu veux des infos sur quel type de soin ?",
-    "tarif": "Les tarifs varient selon les soins. Tu veux des infos sur quel type de soin ?",
-    "conseil": "SEASONAL_TIP",
-    "conseil du jour": "SEASONAL_TIP",
-    "astuce": "SEASONAL_TIP",
-}
+
+def is_social_greeting(message: str) -> bool:
+    """Détecte si le message est une salutation sociale simple."""
+    greetings = ["bonjour", "salut", "merci", "au revoir", "bye"]
+    return message.strip().lower() in greetings
 
 # =============================================================================
 # MOTS CLÉS DE FIN DE CONVERSATION
@@ -50,28 +40,35 @@ COLLECTION_PRODUCTS = os.getenv("QDRANT_COLLECTION_NAME", "bodyminute_docs")
 END_CONVERSATION_KEYWORDS = ["au revoir", "bye", "merci c'est tout", "stop", "arrête", "fin"]
 
 # =============================================================================
-# CONSEILS BEAUTÉ SAISONNIERS
+# CONSEIL BEAUTÉ VIA LLM (remplace SEASONAL_TIPS — CDC V4.0 Ch.25)
 # =============================================================================
 
-    1: "❄️ En janvier, protège ta peau du froid ! L'hydratation profonde est essentielle. Essaie notre soin Hydratempo !",
-    2: "❄️ Février = peau sèche ! Pense aux masques nourrissants et à bien hydrater matin et soir.",
-    3: "🌸 Le printemps arrive ! C'est le moment de détoxifier ta peau avec un soin S-Détox.",
-    4: "🌸 Avril = renouveau ! Un gommage doux pour éliminer les cellules mortes de l'hiver.",
-    5: "☀️ Le soleil revient ! Pense à la protection UV et à l'hydratation légère.",
-    6: "☀️ Juin = préparation été ! Soins minceur et raffermissants pour être au top !",
-    7: "🏖️ En plein été, hydratation et après-soleil sont tes meilleurs amis !",
-    8: "🏖️ Août chaud ! Soins légers, brume rafraîchissante, et beaucoup d'eau.",
-    9: "🍂 Rentrée = détox ! Répare ta peau après l'été avec nos soins régénérants.",
-    10: "🍂 Octobre doré ! Prépare ta peau au froid avec une routine hydratante.",
-    11: "🍁 Novembre frais ! Intensifie l'hydratation et protège du vent.",
-    12: "🎄 Décembre festif ! Éclat garanti avec nos soins Facialiste 100% Éclat !"
-}
 
-
-def get_seasonal_tip() -> str:
-    """Retourne le conseil beauté du mois."""
+def get_seasonal_tip(llm_provider=None) -> str:
+    """Génère un conseil beauté du moment via le LLM — aucun contenu hardcodé."""
+    from datetime import datetime
     month = datetime.now().month
-
+    month_names = {
+        1: "janvier", 2: "février", 3: "mars", 4: "avril",
+        5: "mai", 6: "juin", 7: "juillet", 8: "août",
+        9: "septembre", 10: "octobre", 11: "novembre", 12: "décembre"
+    }
+    if llm_provider is None:
+        try:
+            from backend.llm.provider import get_llm_provider
+            llm_provider = get_llm_provider()
+        except Exception:
+            return ""
+    prompt = f"Donne un conseil beauté court et engageant pour le mois de {month_names[month]} adapté aux clientes d'un institut Body Minute. Maximum 2 phrases."
+    try:
+        response = llm_provider.generate_sync(
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+            max_tokens=100,
+        )
+        return response.text.strip()
+    except Exception:
+        return ""
 
 # =============================================================================
 # CONFIGURATION LLM
